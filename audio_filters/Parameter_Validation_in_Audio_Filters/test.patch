@@ -1,54 +1,70 @@
+
 # Tests for parameter validation in butterworth_filter and iir_filter
 
 import numpy as np
 import pytest
 from audio_filters import butterworth_filter, iir_filter
 
-def test_new_negative_cutoff():
+def test_negative_cutoff():
     signal = np.ones(10)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="cutoff|frequency|positive"):
         butterworth_filter(signal, sample_rate=44100, cutoff_freq=-1, order=2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="cutoff|frequency|positive"):
         iir_filter(signal, sample_rate=44100, cutoff_freq=-1, order=2)
 
-def test_new_zero_sample_rate():
+def test_negative_sample_rate():
     signal = np.ones(10)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="sample.*positive"):
+        butterworth_filter(signal, sample_rate=-44100, cutoff_freq=100, order=2)
+    with pytest.raises(ValueError, match="sample.*positive"):
+        iir_filter(signal, sample_rate=-44100, cutoff_freq=100, order=2)
+
+def test_zero_sample_rate():
+    signal = np.ones(10)
+    with pytest.raises(ValueError, match="sample.*positive"):
         butterworth_filter(signal, sample_rate=0, cutoff_freq=100, order=2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="sample.*positive"):
         iir_filter(signal, sample_rate=0, cutoff_freq=100, order=2)
 
-def test_new_invalid_order():
+def test_invalid_order():
     signal = np.ones(10)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="order.*positive"):
         butterworth_filter(signal, sample_rate=44100, cutoff_freq=100, order=0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="order.*positive"):
         iir_filter(signal, sample_rate=44100, cutoff_freq=100, order=-1)
 
-def test_new_non_numeric_signal():
+def test_non_numeric_signal():
     signal = ["a", "b", "c"]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="numeric"):
         butterworth_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="numeric"):
         iir_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
 
-def test_new_multi_dimensional_signal():
+def test_multi_dimensional_signal():
     signal = np.ones((10, 2))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="1-dimensional"):
         butterworth_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="1-dimensional"):
         iir_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
 
-def test_new_cutoff_above_nyquist():
+def test_cutoff_above_nyquist():
     signal = np.ones(10)
-    with pytest.raises(ValueError):
-        butterworth_filter(signal, sample_rate=44100, cutoff_freq=22050, order=2)
-    with pytest.raises(ValueError):
-        iir_filter(signal, sample_rate=44100, cutoff_freq=22050, order=2)
+    # Nyquist = 22050, so 22051 is above
+    with pytest.raises(ValueError, match="Nyquist"):
+        butterworth_filter(signal, sample_rate=44100, cutoff_freq=22051, order=2)
+    with pytest.raises(ValueError, match="Nyquist"):
+        iir_filter(signal, sample_rate=44100, cutoff_freq=22051, order=2)
 
-def test_new_large_signal():
-    signal = np.ones(1000000)
-    with pytest.raises(ValueError):
-        butterworth_filter(signal, sample_rate=44100, cutoff_freq=0, order=2)
-    with pytest.raises(ValueError):
-        iir_filter(signal, sample_rate=44100, cutoff_freq=0, order=2)
+def test_empty_signal():
+    signal = np.array([])
+    with pytest.raises(ValueError, match="empty"):
+        butterworth_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
+    with pytest.raises(ValueError, match="empty"):
+        iir_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
+
+def test_nan_inf_signal():
+    signal = np.array([1, np.nan, 2, np.inf])
+    with pytest.raises(ValueError, match="NaN|Inf"):
+        butterworth_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
+    with pytest.raises(ValueError, match="NaN|Inf"):
+        iir_filter(signal, sample_rate=44100, cutoff_freq=100, order=2)
