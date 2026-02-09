@@ -1,0 +1,123 @@
+<SYSTEM>
+You are an AI programming assistant that is specialized in applying code changes to an existing document.
+Follow Microsoft content policies.
+Avoid content that violates copyrights.
+If you are asked to generate content that is harmful, hateful, racist, sexist, lewd, violent, or completely irrelevant to software engineering, only respond with "Sorry, I can't assist with that."
+Keep your answers short and impersonal.
+The user has a code block that represents a suggestion for a code change and a diff file opened in a code editor.
+Rewrite the existing document to fully incorporate the code changes in the provided code block.
+For the response, always follow these instructions:
+1. Analyse the code block and the existing document to decide if the code block should replace existing code or should be inserted.
+2. If necessary, break up the code block in multiple parts and insert each part at the appropriate location.
+3. Preserve whitespace and newlines right after the parts of the file that you modify.
+4. The final result must be syntactically valid, properly formatted, and correctly indented. It should not contain any ...existing code... comments.
+5. Finally, provide the fully rewritten file. You must output the complete file.
+</SYSTEM>
+
+
+I have the following code open in the editor, starting from line 1 to line 38.
+```diff
+--- a/audio_filters/butterworth_filter.py
++++ b/audio_filters/butterworth_filter.py
+@@
+ def butterworth_filter(signal, sample_rate, cutoff_freq, order):
+-    # ...existing code...
++    if cutoff_freq <= 0:
++        raise ValueError("Cutoff frequency must be positive.")
++    if sample_rate <= 0:
++        raise ValueError("Sample rate must be positive.")
++    if order <= 0:
++        raise ValueError("Order must be positive.")
++    if not isinstance(signal, (np.ndarray, list)):
++        raise ValueError("Signal must be numeric.")
++    if isinstance(signal, np.ndarray) and signal.ndim != 1:
++        raise ValueError("Signal must be 1-dimensional.")
++    if cutoff_freq >= sample_rate / 2:
++        raise ValueError("Cutoff frequency must be less than Nyquist.")
++    if isinstance(signal, np.ndarray):
++        if signal.size == 0:
++            raise ValueError("Signal must not be empty.")
++        if np.any(np.isnan(signal)) or np.any(np.isinf(signal)):
++            raise ValueError("Signal must not contain NaN or Inf.")
+     # ...existing code...
+
+--- a/audio_filters/iir_filter.py
++++ b/audio_filters/iir_filter.py
+@@
+ def iir_filter(signal, sample_rate, cutoff_freq, order):
+-    # ...existing code...
++    if cutoff_freq <= 0:
++        raise ValueError("Cutoff frequency must be positive.")
++    if sample_rate <= 0:
++        raise ValueError("Sample rate must be positive.")
++    if order <= 0:
++        raise ValueError("Order must be positive.")
++    if not isinstance(signal, (np.ndarray, list)):
++        raise ValueError("Signal must be numeric.")
++    if isinstance(signal, np.ndarray) and signal.ndim != 1:
++        raise ValueError("Signal must be 1-dimensional.")
++    if cutoff_freq >= sample_rate / 2:
++        raise ValueError("Cutoff frequency must be less than Nyquist.")
++    if isinstance(signal, np.ndarray):
++        if signal.size == 0:
++            raise ValueError("Signal must not be empty.")
++        if np.any(np.isnan(signal)) or np.any(np.isinf(signal)):
++            raise ValueError("Signal must not contain NaN or Inf.")
+     # ...existing code...
+```
+This is the description of what the code block changes:
+<changeDescription>
+Update solution.patch to add empty signal and NaN/Inf checks for full edge-case coverage, matching new tests.
+</changeDescription>
+
+This is the code block that represents the suggested code change:
+```diff
+--- a/audio_filters/butterworth_filter.py
++++ b/audio_filters/butterworth_filter.py
+@@
+ def butterworth_filter(signal, sample_rate, cutoff_freq, order):
+    if cutoff_freq <= 0:
+        raise ValueError("Cutoff frequency must be positive.")
+    if sample_rate <= 0:
+        raise ValueError("Sample rate must be positive.")
+    if order <= 0:
+        raise ValueError("Order must be positive.")
+    if not isinstance(signal, (np.ndarray, list)):
+        raise ValueError("Signal must be numeric.")
+    if isinstance(signal, np.ndarray) and signal.ndim != 1:
+        raise ValueError("Signal must be 1-dimensional.")
+    if cutoff_freq >= sample_rate / 2:
+        raise ValueError("Cutoff frequency must be less than Nyquist.")
+    if isinstance(signal, np.ndarray):
+        if signal.size == 0:
+            raise ValueError("Signal must not be empty.")
+        if np.any(np.isnan(signal)) or np.any(np.isinf(signal)):
+            raise ValueError("Signal must not contain NaN or Inf.")
+    # ...existing code...
+
+--- a/audio_filters/iir_filter.py
++++ b/audio_filters/iir_filter.py
+@@
+ def iir_filter(signal, sample_rate, cutoff_freq, order):
+    if cutoff_freq <= 0:
+        raise ValueError("Cutoff frequency must be positive.")
+    if sample_rate <= 0:
+        raise ValueError("Sample rate must be positive.")
+    if order <= 0:
+        raise ValueError("Order must be positive.")
+    if not isinstance(signal, (np.ndarray, list)):
+        raise ValueError("Signal must be numeric.")
+    if isinstance(signal, np.ndarray) and signal.ndim != 1:
+        raise ValueError("Signal must be 1-dimensional.")
+    if cutoff_freq >= sample_rate / 2:
+        raise ValueError("Cutoff frequency must be less than Nyquist.")
+    if isinstance(signal, np.ndarray):
+        if signal.size == 0:
+            raise ValueError("Signal must not be empty.")
+        if np.any(np.isnan(signal)) or np.any(np.isinf(signal)):
+            raise ValueError("Signal must not contain NaN or Inf.")
+    # ...existing code...
+```
+<userPrompt>
+Provide the fully rewritten file, incorporating the suggested code change. You must produce the complete file.
+</userPrompt>
